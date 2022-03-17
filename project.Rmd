@@ -1,0 +1,201 @@
+---
+title: "Biost537_project"
+author: "Jiawen Liu"
+date: "3/11/2021"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Desktop/Biost537/Project/")
+library(survival)
+```
+
+```{r}
+bmt = read.csv("bmt.csv")
+```
+
+problem 3
+```{r}
+s.bmt = with(bmt, Surv(tdfs, deltadfs))
+```
+
+```{r}
+bmt.cox.1 = coxph(s.bmt ~ age, data=bmt)
+summary(bmt.cox.1)
+```
+
+```{r}
+bmt.cox.2 = coxph(s.bmt ~ male, data=bmt)
+summary(bmt.cox.2)
+```
+
+```{r}
+bmt.cox.3 = coxph(s.bmt ~donorage, data=bmt)
+summary(bmt.cox.3)
+```
+
+```{r}
+bmt.cox.4 = coxph(s.bmt ~ donormale, data=bmt)
+summary(bmt.cox.4)
+```
+
+```{r}
+bmt.cox.5 = coxph(s.bmt ~ cmv, data=bmt)
+summary(bmt.cox.5)
+```
+
+```{r}
+bmt.cox.6 = coxph(s.bmt ~ donorcmv, data=bmt)
+summary(bmt.cox.6)
+```
+
+```{r}
+bmt.cox.7 = coxph(s.bmt ~ waittime, data=bmt)
+summary(bmt.cox.7)
+```
+
+```{r}
+bmt.cox.8 = coxph(s.bmt ~ mtx, data=bmt)
+summary(bmt.cox.8)
+```
+
+```{r}
+bmt.cox.9 = coxph(s.bmt ~ as.factor(hospital), data=bmt)
+summary(bmt.cox.9)
+```
+
+```{r}
+bmt.cox.10 = coxph(s.bmt ~ as.factor(fab), data=bmt)
+summary(bmt.cox.10)
+```
+
+
+problem 4
+```{r}
+bmt.cox.11 = coxph(s.bmt ~ deltaa, data=bmt)
+summary(bmt.cox.11)
+```
+
+```{r}
+# time-varying
+bmt.tvc = tmerge(data1=bmt,
+                 data2=bmt,
+                 id=id,
+                 deltadfs=event(tdfs, deltadfs),
+                 postaGVHD=tdc(ta))
+s.bmt.tvc = with(bmt.tvc, Surv(tstart, tstop, deltadfs))
+bmt.cox.12 = coxph(s.bmt.tvc ~ postaGVHD+mtx+fab, data=bmt.tvc)
+summary(bmt.cox.12)
+```
+
+```{r}
+bmt.tvc = tmerge(data1=bmt,
+                 data2=bmt,
+                 id=id,
+                 deltadfs=event(tdfs, deltar),
+                 postaGVHD=tdc(ta))
+s.bmt.tvc = with(bmt.tvc, Surv(tstart, tstop, deltar))
+bmt.cox.12 = coxph(s.bmt.tvc ~ postaGVHD+mtx+fab, data=bmt.tvc)
+summary(bmt.cox.12)
+```
+
+
+problem 5
+```{r}
+aGVHD = subset(bmt, deltaa==1)
+s.aGVHD = with(aGVHD, Surv(tdfs, deltadfs))
+```
+
+```{r}
+aGVHD.cox.1 = coxph(s.aGVHD ~ age, data=aGVHD)
+summary(aGVHD.cox.1)
+aGVHD.cox.1 = coxph(s.aGVHD ~ age + strata(hospital), data=aGVHD)
+summary(aGVHD.cox.1)
+```
+
+```{r}
+aGVHD.cox.2 = coxph(s.aGVHD ~ male, data=aGVHD)
+summary(aGVHD.cox.2)
+```
+
+```{r}
+##
+aGVHD.cox.3 = coxph(s.aGVHD ~donorage, data=aGVHD)
+summary(aGVHD.cox.3)
+```
+
+```{r}
+aGVHD.cox.4 = coxph(s.aGVHD ~ donormale, data=aGVHD)
+summary(aGVHD.cox.4)
+```
+
+```{r}
+aGVHD.cox.5 = coxph(s.aGVHD ~ cmv, data=aGVHD)
+summary(aGVHD.cox.5)
+```
+
+```{r}
+aGVHD.cox.6 = coxph(s.aGVHD ~ donorcmv, data=aGVHD)
+summary(aGVHD.cox.6)
+```
+
+```{r}
+aGVHD.cox.7 = coxph(s.aGVHD ~ waittime, data=aGVHD)
+summary(aGVHD.cox.7)
+```
+
+```{r}
+aGVHD.cox.8 = coxph(s.aGVHD ~ mtx, data=aGVHD)
+summary(aGVHD.cox.8)
+```
+
+```{r}
+##
+aGVHD.cox.9 = coxph(s.aGVHD ~ as.factor(hospital), data=aGVHD)
+summary(aGVHD.cox.9)
+```
+
+```{r}
+##
+aGVHD.cox.10 = coxph(s.aGVHD ~ fab, data=aGVHD)
+summary(aGVHD.cox.10)
+```
+
+problem 6
+```{r}
+s.bmt.aGVHD = with(bmt, Surv(ta, deltaa))
+
+bmt.cox.21 = coxph(s.bmt.aGVHD ~ as.factor(mtx)+ age + male+ cmv + fab + as.factor(hospital), data=bmt)
+summary(bmt.cox.21)
+
+summary(bmt.cox.21)
+hospital3 = subset(bmt, hospital==3) ## only have mtx = 1 patients
+```
+
+
+problem 7
+```{r}
+# time-varying
+bmt.tvc.3 = tmerge(data1=bmt,
+                 data2=bmt,
+                 id=id,
+                 deltadfs=event(tdfs, deltadfs),
+                 postPlatelet=tdc(tp))
+s.bmt.tvc.3 = with(bmt.tvc.2, Surv(tstart, tstop, deltadfs))
+bmt.cox.22 = coxph(s.bmt.tvc.2 ~ postPlatelet, data=bmt.tvc.2)
+summary(bmt.cox.22)
+```
+
+```{r}
+# time-varying
+bmt.tvc.4 = tmerge(data1=bmt,
+                 data2=bmt,
+                 id=id,
+                 deltadfs=event(tdfs, deltar),
+                 postPlatelet=tdc(tp))
+s.bmt.tvc.4 = with(bmt.tvc.4, Surv(tstart, tstop, deltadfs))
+bmt.cox.23 = coxph(s.bmt.tvc.4 ~ postPlatelet, data=bmt.tvc.4)
+summary(bmt.cox.23)
+```
+
+
